@@ -2,7 +2,7 @@ import React from 'react'
 
 function Homepage() {
   return (
-    <div>Homepage</div>
+    <div className='text-sm flex p-6'>Homepage</div>
   )
 }
 
