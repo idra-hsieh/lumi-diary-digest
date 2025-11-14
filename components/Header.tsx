@@ -10,7 +10,7 @@ import LogOutButton from "./LogOutButton";
 
 function Header() {
   const { resolvedTheme } = useTheme();
-  const user = { name: "Idra" };
+  const user = null; // { name: "Idra" }
 
   // Use resolvedTheme to handle "system" theme correctly
   const isDark = resolvedTheme === "dark";
