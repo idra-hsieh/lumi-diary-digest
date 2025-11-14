@@ -1,12 +1,21 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 import { shadow } from "@/app/styles/utils";
 import { Button } from "./ui/button";
 import DarkModeToggle from "./DarkModeToggle";
 import LogOutButton from "./LogOutButton";
 
 function Header() {
+  const { resolvedTheme } = useTheme();
   const user = { name: "Idra" };
+
+  // Use resolvedTheme to handle "system" theme correctly
+  const isDark = resolvedTheme === "dark";
+  const logoSrc = isDark ? "/dark-logo.png" : "/light-logo.png";
+
   return (
     <header
       className="bg-background relative flex h-24 w-full items-center justify-between px-3 sm:px-8"
@@ -16,7 +25,7 @@ function Header() {
     >
       <Link href="/" className="-mt-2">
         <Image
-          src="/light-logo-wordmark.png"
+          src={logoSrc}
           height={150}
           width={250}
           alt="logo"
