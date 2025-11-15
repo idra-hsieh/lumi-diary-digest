@@ -35,12 +35,17 @@ function HeaderContent({ user }: HeaderContentProps) {
           <LogOutButton />
         ) : (
           <>
-            <Button asChild>
-              <Link href="/signup" className="sm:bg-foreground hidden sm:block">
-                Sign Up
-              </Link>
+            <Button
+              asChild
+              className="bg-foreground text-background hidden sm:inline-flex"
+            >
+              <Link href="/signup">Sign Up</Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button
+              asChild
+              variant="outline"
+              className="text-foreground border-foreground/30"
+            >
               <Link href="/login">Log In</Link>
             </Button>
           </>
