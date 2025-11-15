@@ -9,6 +9,7 @@ import { Button } from "./ui/button";
 import { useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { loginAction, signupAction } from "@/actions/users";
 
 type Props = {
   type: "login" | "signup"; // allows autocomplete for selection
@@ -20,12 +21,35 @@ function AuthForm({ type }: Props) {
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = (formData: FormData) => {
-    console.log("form submitted");
+    startTransition(async () => {
+      const email = formData.get("email") as string;
+      const password = formData.get("password") as string;
+
+      let errorMessage;
+      let successMessage;
+
+      if (isLoginForm) {
+        const result = await loginAction(email, password);
+        errorMessage = result.errorMessage;
+        successMessage = "You have been successfully logged in.";
+      } else {
+        const result = await signupAction(email, password);
+        errorMessage = result.errorMessage;
+        successMessage = "Sign up successful — check your email.";
+      }
+
+      if (!errorMessage) {
+        toast.success(successMessage);
+        router.replace("/");
+      } else {
+        toast.error(errorMessage);
+      }
+    });
   };
 
   return (
     <form action={handleSubmit}>
-      <CardContent className="w=full grid items-center gap-4">
+      <CardContent className="grid w-full items-center gap-4">
         <div className="flex flex-col space-y-1.5">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -49,8 +73,8 @@ function AuthForm({ type }: Props) {
           />
         </div>
       </CardContent>
-      <CardFooter>
-        <Button>
+      <CardFooter className="flex w-full flex-col items-stretch gap-2">
+        <Button type="submit" disabled={isPending} className="mt-2 w-full">
           {isPending ? (
             <Loader2 className="animate-spin" />
           ) : isLoginForm ? (
@@ -59,10 +83,11 @@ function AuthForm({ type }: Props) {
             "Sign Up"
           )}
         </Button>
-        <p className="text-xs">
+        <p className="w-full text-center text-xs">
           {isLoginForm
             ? "Don't have an account yet?"
-            : "Already have an account?"}{" "}
+            : "Already have an account?"}
+          {"  "}
           <Link
             href={isLoginForm ? "/signup" : "/login"}
             className={`text-blue-500 underline ${
