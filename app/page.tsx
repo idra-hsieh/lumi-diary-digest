@@ -1,9 +1,35 @@
-import React from 'react'
+import AskAIButton from "@/components/AskAIButton";
+import DiaryTextInput from "@/components/DiaryTextInput";
+import NewDiaryButton from "@/components/NewDiaryButton";
+import { prisma } from "@/db/prisma";
+import { getUser } from "@/utils/supabase/server";
 
-function Homepage() {
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+async function Homepage({ searchParams }: Props) {
+  const diaryIdParam = (await searchParams).noteId;
+  const user = await getUser();
+
+  const diaryId = Array.isArray(diaryIdParam)
+    ? diaryIdParam![0]
+    : diaryIdParam || "";
+
+  const diary = await prisma.diary.findUnique({
+    where: { id: diaryId, authorId: user?.id },
+  });
+
   return (
-    <div className='text-sm flex p-6'>Homepage</div>
-  )
+    <div className="flex h-full flex-col items-center gap-4">
+      <div className="flex w-full max-w-4xl justify-end gap-2">
+        <AskAIButton user={user} />
+        <NewDiaryButton user={user} />
+      </div>
+
+      <DiaryTextInput diaryId={diaryId} startingDiaryText={diary?.text || ""} />
+    </div>
+  );
 }
 
-export default Homepage
+export default Homepage;
