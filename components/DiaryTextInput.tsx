@@ -5,6 +5,7 @@ import { Textarea } from "./ui/textarea";
 import { debounceTimeout } from "@/lib/constants";
 import { ChangeEvent, useEffect } from "react";
 import useDiary from "@/hooks/useDiary";
+import { updateDiaryAction } from "@/actions/diaries";
 
 type Props = {
   diaryId: string;
@@ -29,7 +30,7 @@ function DiaryTextInput({ diaryId, startingDiaryText }: Props) {
 
     clearTimeout(updateTimeout);
     updateTimeout = setTimeout(() => {
-      updateNoteAction(diaryId, text);
+      updateDiaryAction(diaryId, text);
     }, debounceTimeout);
   };
 
