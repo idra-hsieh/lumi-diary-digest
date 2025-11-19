@@ -15,7 +15,7 @@ function SidebarGroupContent({ diaries }: Props) {
   return (
     <SidebarGroupContentShadCN>
       <div className="relative flex items-center">
-        <SearchIcon className="absolute left-2 size-2" />
+        <SearchIcon className="absolute left-2 size-4" />
         <Input
           className="bg-muted pl-8"
           placeholder="Search your diary..."
