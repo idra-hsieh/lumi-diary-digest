@@ -42,13 +42,13 @@ function SelectDiaryButton({ diary }: Props) {
   return (
     <SidebarMenuButton
       asChild
-      className={`items-start gap-0 pr-12 ${diary.id === diaryId && "bg-sidebar-accent/50"}`}
+      className={`items-start gap-0 pr-12 ${diary.id === diaryId && "bg-sidebar-accent/30"}`}
     >
       <Link href={`/?diaryId=${diary.id}`} className="flex h-fit flex-col">
-        <p className="w-full truncate overflow-hidden text-ellipsis whitespace-nowrap">
+        <p className="text-foreground w-full truncate overflow-hidden whitespace-nowrap">
           {diary.title}
         </p>
-        <p className="w-full truncate overflow-hidden text-ellipsis whitespace-nowrap">
+        <p className="text-foreground w-full truncate overflow-hidden whitespace-nowrap">
           {diaryText}
         </p>
         <p className="text-muted-foreground text-xs">
