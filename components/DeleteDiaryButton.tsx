@@ -12,7 +12,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "./ui/button";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
+import { useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { deleteDiaryAction } from "@/actions/diaries";
 
 type Props = {
   diaryId: string;
@@ -20,8 +24,27 @@ type Props = {
 };
 
 function DeleteDiaryButton({ diaryId, deleteDiaryLocally }: Props) {
-  const handleDelete = () => {
-    deleteDiaryLocally(diaryId);
+  const router = useRouter();
+  const diaryIdParam = useSearchParams().get("diaryIs") || "";
+
+  const [isPending, startTransition] = useTransition();
+
+  const handleDeleteDiary = () => {
+    startTransition(async () => {
+      const { errorMessage } = await deleteDiaryAction(diaryId);
+
+      if (!errorMessage) {
+        toast.success("You have successfully deleted the diary.");
+      }
+
+      deleteDiaryLocally(diaryId);
+
+      if (diaryId === diaryIdParam) {
+        router.replace("/");
+      } else {
+        toast.error(errorMessage);
+      }
+    });
   };
 
   return (
@@ -36,16 +59,21 @@ function DeleteDiaryButton({ diaryId, deleteDiaryLocally }: Props) {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>
+            Are you sure you want to delete this diary?
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this
-            diary and its contents.
+            This action cannot be undone. This will permanently delete your
+            diary from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete}>
-            Delete diary
+          <AlertDialogAction
+            onClick={handleDeleteDiary}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 w-24"
+          >
+            {isPending ? <Loader2 className="animate-spin" /> : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

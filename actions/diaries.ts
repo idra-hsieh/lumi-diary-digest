@@ -39,3 +39,18 @@ export const updateDiaryAction = async (diaryId: string, text: string) => {
     return handleError(error);
   }
 };
+
+export const deleteDiaryAction = async (diaryId: string) => {
+  try {
+    const user = await getUser();
+    if (!user) throw new Error("You must log in to delete a diary.");
+
+    await prisma.diary.delete({
+      where: { id: diaryId, authorId: user.id },
+    });
+
+    return { errorMessage: null };
+  } catch (error) {
+    return handleError(error);
+  }
+};
