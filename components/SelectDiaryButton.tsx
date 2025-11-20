@@ -28,7 +28,7 @@ function SelectDiaryButton({ diary }: Props) {
   }, [diaryId, diary.id]);
 
   useEffect(() => {
-    if (setShouldUseGlobalDiaryText) {
+    if (shouldUseGlobalDiaryText) {
       setlocalDiaryText(selectedDiaryText);
     }
   }, [selectedDiaryText, shouldUseGlobalDiaryText]);

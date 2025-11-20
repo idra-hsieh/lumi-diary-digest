@@ -20,11 +20,15 @@ type Props = {
 };
 
 function DeleteDiaryButton({ diaryId, deleteDiaryLocally }: Props) {
+  const handleDelete = () => {
+    deleteDiaryLocally(diaryId);
+  };
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
-          className="goup-hover/item:opacity-100 absolute top-1/2 right-2 size-7 -translate-y-1/2 p-0 opacity-0 [&_svg]:size-3"
+          className="absolute top-1/2 right-2 size-7 -translate-y-1/2 p-0 opacity-0 group-hover/item:opacity-100 [&_svg]:size-3"
           variant="ghost"
         >
           <Trash2 />
@@ -34,13 +38,15 @@ function DeleteDiaryButton({ diaryId, deleteDiaryLocally }: Props) {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            This action cannot be undone. This will permanently delete this
+            diary and its contents.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={handleDelete}>
+            Delete diary
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
