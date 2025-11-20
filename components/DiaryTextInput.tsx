@@ -38,7 +38,7 @@ function DiaryTextInput({ diaryId, startingDiaryText }: Props) {
     <Textarea
       value={diaryText}
       onChange={handleUpdateDiary}
-      placeholder="Type your notes here."
+      placeholder="What's on your mind?"
       className="custom-scrollbar placeholder:text-muted-foreground mb-4 h-full max-w-4xl resize-none border p-4 focus-visible:ring-0 focus-visible:ring-offset-0"
     />
   );
