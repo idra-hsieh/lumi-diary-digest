@@ -57,7 +57,8 @@ function SelectDiaryButton({ diary }: Props) {
           {displayText}
         </p>
         <p className="text-muted-foreground text-xs">
-          Last updated: {diary.updatedAt.toLocaleDateString()}
+          Last updated:{" "}
+          {diary.updatedAt.toISOString().slice(0, 16).replace("T", " ")}
         </p>
       </Link>
     </SidebarMenuButton>

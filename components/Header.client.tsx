@@ -29,10 +29,10 @@ function HeaderContent({ user }: HeaderContentProps) {
       }}
     >
       <SidebarTrigger className="absolute top-1 left-1" />
-      <Link href="/" className="-mt-2">
+      <Link href="/" className="-mt-2 lg:pl-10">
         <Image src={logoSrc} height={150} width={250} alt="logo" priority />
       </Link>
-      <div className="flex gap-4">
+      <div className="flex gap-4 lg:pr-10">
         {user ? (
           <LogOutButton />
         ) : (
