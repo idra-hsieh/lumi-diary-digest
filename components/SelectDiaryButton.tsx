@@ -1,0 +1,62 @@
+"use client";
+
+import useDiary from "@/hooks/useDiary";
+import { Diary } from "@prisma/client";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { SidebarMenuButton } from "./ui/sidebar";
+
+type Props = {
+  diary: Diary;
+};
+
+function SelectDiaryButton({ diary }: Props) {
+  const diaryId = useSearchParams().get("diaryId") || "";
+
+  const { diaryText: selectedDiaryText } = useDiary();
+  const [shouldUseGlobalDiaryText, setShouldUseGlobalDiaryText] =
+    useState(false);
+  const [localDiaryText, setlocalDiaryText] = useState(diary.text);
+
+  useEffect(() => {
+    if (diaryId === diary.id) {
+      setShouldUseGlobalDiaryText(true);
+    } else {
+      setShouldUseGlobalDiaryText(false);
+    }
+  }, [diaryId, diary.id]);
+
+  useEffect(() => {
+    if (setShouldUseGlobalDiaryText) {
+      setlocalDiaryText(selectedDiaryText);
+    }
+  }, [selectedDiaryText, shouldUseGlobalDiaryText]);
+
+  const blankDiaryText = "EMPTY DIARY";
+  let diaryText = localDiaryText || blankDiaryText;
+  if (shouldUseGlobalDiaryText) {
+    diaryText = selectedDiaryText || blankDiaryText;
+  }
+
+  return (
+    <SidebarMenuButton
+      asChild
+      className={`items-start gap-0 pr-12 ${diary.id === diaryId && "bg-sidebar-accent/50"}`}
+    >
+      <Link href={`/?diaryId=${diary.id}`} className="flex h-fit flex-col">
+        <p className="w-full truncate overflow-hidden text-ellipsis whitespace-nowrap">
+          {diary.title}
+        </p>
+        <p className="w-full truncate overflow-hidden text-ellipsis whitespace-nowrap">
+          {diaryText}
+        </p>
+        <p className="text-muted-foreground text-xs">
+          {diary.createdAt.toLocaleDateString()}
+        </p>
+      </Link>
+    </SidebarMenuButton>
+  );
+}
+
+export default SelectDiaryButton;

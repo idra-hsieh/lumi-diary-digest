@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 import DarkModeToggle from "./DarkModeToggle";
 import LogOutButton from "./LogOutButton";
 import type { User } from "@supabase/supabase-js";
+import { SidebarTrigger } from "./ui/sidebar";
 
 type HeaderContentProps = {
   user: User | null;
@@ -27,6 +28,7 @@ function HeaderContent({ user }: HeaderContentProps) {
         boxShadow: shadow,
       }}
     >
+      <SidebarTrigger className="absolute top-1 left-1" />
       <Link href="/" className="-mt-2">
         <Image src={logoSrc} height={150} width={250} alt="logo" priority />
       </Link>
