@@ -30,7 +30,7 @@ function DiaryTextInput({ diaryId, startingDiaryText }: Props) {
 
     clearTimeout(updateTimeout);
     updateTimeout = setTimeout(() => {
-      updateDiaryAction(diaryId, text);
+      updateDiaryAction(diaryId, { text });
     }, debounceTimeout);
   };
 

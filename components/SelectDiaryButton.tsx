@@ -4,8 +4,9 @@ import useDiary from "@/hooks/useDiary";
 import { Diary } from "@prisma/client";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import { SidebarMenuButton } from "./ui/sidebar";
+import { BLANK_DIARY_TEXT } from "@/lib/constants";
+import { buildDiaryFallbackTitle, cn } from "@/lib/utils";
 
 type Props = {
   diary: Diary;
@@ -14,45 +15,49 @@ type Props = {
 function SelectDiaryButton({ diary }: Props) {
   const diaryId = useSearchParams().get("diaryId") || "";
 
-  const { diaryText: selectedDiaryText } = useDiary();
-  const [shouldUseGlobalDiaryText, setShouldUseGlobalDiaryText] =
-    useState(false);
-  const [localDiaryText, setlocalDiaryText] = useState(diary.text);
+  const { diaryText: selectedDiaryText, diaryTitle: selectedDiaryTitle } =
+    useDiary();
+  const isSelected = diaryId === diary.id;
 
-  useEffect(() => {
-    if (diaryId === diary.id) {
-      setShouldUseGlobalDiaryText(true);
-    } else {
-      setShouldUseGlobalDiaryText(false);
-    }
-  }, [diaryId, diary.id]);
+  const fallbackTitle = buildDiaryFallbackTitle(diary.createdAt, "-");
 
-  useEffect(() => {
-    if (shouldUseGlobalDiaryText) {
-      setlocalDiaryText(selectedDiaryText);
-    }
-  }, [selectedDiaryText, shouldUseGlobalDiaryText]);
+  const sourceTitle = isSelected ? selectedDiaryTitle : diary.title;
+  const normalizedTitle = sourceTitle?.trim() ?? "";
+  const displayTitle = normalizedTitle || fallbackTitle;
+  const isFallbackTitle = normalizedTitle.length === 0;
 
-  const blankDiaryText = "EMPTY DIARY";
-  let diaryText = localDiaryText || blankDiaryText;
-  if (shouldUseGlobalDiaryText) {
-    diaryText = selectedDiaryText || blankDiaryText;
-  }
+  const sourceText = isSelected ? selectedDiaryText : diary.text;
+  const normalizedText = sourceText?.trim() ?? "";
+  const displayText = normalizedText || BLANK_DIARY_TEXT;
+  const isFallbackText = normalizedText.length === 0;
 
   return (
     <SidebarMenuButton
       asChild
-      className={`items-start gap-0 pr-12 ${diary.id === diaryId && "bg-sidebar-accent/30"}`}
+      className={cn(
+        "items-start gap-0 pr-12",
+        isSelected && "bg-sidebar-accent/30",
+      )}
     >
       <Link href={`/?diaryId=${diary.id}`} className="flex h-fit flex-col">
-        <p className="text-foreground w-full truncate overflow-hidden whitespace-nowrap">
-          {diary.title}
+        <p
+          className={cn(
+            "text-foreground w-full truncate overflow-hidden text-sm font-semibold whitespace-nowrap",
+            isFallbackTitle && "opacity-70",
+          )}
+        >
+          {displayTitle}
         </p>
-        <p className="text-foreground w-full truncate overflow-hidden whitespace-nowrap">
-          {diaryText}
+        <p
+          className={cn(
+            "text-foreground w-full truncate overflow-hidden text-xs whitespace-nowrap",
+            isFallbackText && "opacity-70",
+          )}
+        >
+          {displayText}
         </p>
         <p className="text-muted-foreground text-xs">
-          {diary.createdAt.toLocaleDateString()}
+          Last updated: {diary.updatedAt.toLocaleDateString()}
         </p>
       </Link>
     </SidebarMenuButton>

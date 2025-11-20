@@ -8,6 +8,16 @@ import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createDiaryAction } from "@/actions/diaries";
+import { DIARY_CREATED_EVENT } from "@/lib/constants";
+
+type DiaryCreatedEventPayload = {
+  id: string;
+  title: string;
+  text: string;
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
+};
 
 type Props = {
   user: User | null;
@@ -24,10 +34,34 @@ function NewDiaryButton({ user }: Props) {
     } else {
       setLoading(true);
       const uuid = uuidv4();
-      await createDiaryAction(uuid);
-      router.push(`/?diaryId=${uuid}`);
+      try {
+        const { errorMessage, diary } = await createDiaryAction(uuid);
+        if (errorMessage || !diary) {
+          toast.error(errorMessage || "Unable to create diary.");
+          return;
+        }
 
-      toast.success("You have created a new diary.");
+        const detail: DiaryCreatedEventPayload = {
+          id: diary.id,
+          title: diary.title,
+          text: diary.text,
+          authorId: diary.authorId,
+          createdAt: new Date(diary.createdAt).toISOString(),
+          updatedAt: new Date(diary.updatedAt).toISOString(),
+        };
+
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(
+            new CustomEvent(DIARY_CREATED_EVENT, { detail }),
+          );
+        }
+
+        router.push(`/?diaryId=${uuid}`);
+        router.refresh();
+        toast.success("You have created a new diary.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

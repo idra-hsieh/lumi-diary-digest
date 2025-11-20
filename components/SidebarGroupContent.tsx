@@ -12,9 +12,19 @@ import { useEffect, useMemo, useState } from "react";
 import Fuse from "fuse.js";
 import SelectDiaryButton from "./SelectDiaryButton";
 import DeleteDiaryButton from "./DeleteDiaryButton";
+import { DIARY_CREATED_EVENT } from "@/lib/constants";
 
 type Props = {
   diaries: Diary[];
+};
+
+type DiaryCreatedEventPayload = {
+  id: string;
+  title: string;
+  text: string;
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 function SidebarGroupContent({ diaries }: Props) {
@@ -24,6 +34,35 @@ function SidebarGroupContent({ diaries }: Props) {
   useEffect(() => {
     setLocalDiaries(diaries);
   }, [diaries]);
+
+  useEffect(() => {
+    const handleDiaryCreated = (event: Event) => {
+      const customEvent = event as CustomEvent<DiaryCreatedEventPayload>;
+      if (!customEvent.detail) return;
+
+      const { detail } = customEvent;
+
+      setLocalDiaries((prevDiaries) => {
+        const normalizedDiary: Diary = {
+          ...detail,
+          createdAt: new Date(detail.createdAt),
+          updatedAt: new Date(detail.updatedAt),
+        } as Diary;
+
+        const withoutDuplicates = prevDiaries.filter(
+          (diary) => diary.id !== detail.id,
+        );
+
+        return [normalizedDiary, ...withoutDuplicates];
+      });
+    };
+
+    window.addEventListener(DIARY_CREATED_EVENT, handleDiaryCreated);
+
+    return () => {
+      window.removeEventListener(DIARY_CREATED_EVENT, handleDiaryCreated);
+    };
+  }, []);
 
   const fuse = useMemo(() => {
     return new Fuse(localDiaries, {

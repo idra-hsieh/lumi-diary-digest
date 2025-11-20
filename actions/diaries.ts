@@ -8,30 +8,41 @@ export const createDiaryAction = async (diaryId: string) => {
   try {
     const user = await getUser();
     if (!user) throw new Error("You must log in to create a diary.");
-
-    await prisma.diary.create({
+    const diary = await prisma.diary.create({
       data: {
         id: diaryId,
         authorId: user.id,
-        title: new Date().toISOString().slice(0, 10),
+        title: "",
         text: "",
       },
     });
 
-    return { errorMessage: null };
+    return { errorMessage: null, diary };
   } catch (error) {
-    return handleError(error);
+    const { errorMessage } = handleError(error);
+    return { errorMessage, diary: null };
   }
 };
 
-export const updateDiaryAction = async (diaryId: string, text: string) => {
+type DiaryUpdateData = Partial<{
+  text: string;
+  title: string;
+}>;
+
+export const updateDiaryAction = async (
+  diaryId: string,
+  data: DiaryUpdateData,
+) => {
   try {
     const user = await getUser();
     if (!user) throw new Error("You must log in to update a diary.");
+    if (!data || Object.keys(data).length === 0) {
+      return { errorMessage: null };
+    }
 
     await prisma.diary.update({
       where: { id: diaryId },
-      data: { text },
+      data,
     });
 
     return { errorMessage: null };

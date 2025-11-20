@@ -1,5 +1,6 @@
 import AskAIButton from "@/components/AskAIButton";
 import DiaryTextInput from "@/components/DiaryTextInput";
+import DiaryTitleInput from "@/components/DiaryTitleInput";
 import NewDiaryButton from "@/components/NewDiaryButton";
 import { prisma } from "@/db/prisma";
 import { getUser } from "@/utils/supabase/server";
@@ -20,6 +21,8 @@ async function Homepage({ searchParams }: Props) {
     where: { id: diaryId, authorId: user?.id },
   });
 
+  const derivedDiaryTitle = diary?.title?.trim() ?? "";
+
   return (
     <div className="flex h-full flex-col items-center gap-4">
       <div className="flex w-full max-w-4xl justify-end gap-2">
@@ -27,6 +30,10 @@ async function Homepage({ searchParams }: Props) {
         <NewDiaryButton user={user} />
       </div>
 
+      <DiaryTitleInput
+        diaryId={diaryId}
+        startingDiaryTitle={derivedDiaryTitle}
+      />
       <DiaryTextInput diaryId={diaryId} startingDiaryText={diary?.text || ""} />
     </div>
   );
