@@ -41,7 +41,7 @@ export const updateDiaryAction = async (
     }
 
     await prisma.diary.update({
-      where: { id: diaryId },
+      where: { id: diaryId, authorId: user.id },
       data,
     });
 

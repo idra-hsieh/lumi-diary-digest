@@ -5,13 +5,12 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { getUser } from "@/utils/supabase/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/db/prisma";
 import Link from "next/link";
 import { Diary } from "@/types/prisma";
 import SidebarGroupContent from "./SidebarGroupContent";
 
 async function AppSidebar() {
-  const prisma = new PrismaClient();
   const user = await getUser();
   let diaries: Diary[] = [];
 
