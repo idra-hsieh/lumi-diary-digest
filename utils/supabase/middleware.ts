@@ -2,42 +2,53 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
+  // 1. Initialize the response
   let supabaseResponse = NextResponse.next({
     request,
   });
-  console.log("middleware ran");
 
-  //   const supabase = createServerClient(
-  //     process.env.SUPABASE_URL!,
-  //     process.env.SUPABASE_ANON_KEY!,
-  //     {
-  //       cookies: {
-  //         getAll() {
-  //           return request.cookies.getAll();
-  //         },
-  //         setAll(cookiesToSet) {
-  //           cookiesToSet.forEach(({ name, value }) =>
-  //             request.cookies.set(name, value),
-  //           );
-  //           supabaseResponse = NextResponse.next({
-  //             request,
-  //           });
-  //           cookiesToSet.forEach(({ name, value }) =>
-  //             supabaseResponse.cookies.set(name, value),
-  //           );
-  //         },
-  //       },
-  //     },
-  //   );
+  // 2. Create Supabase client
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value),
+          );
+          supabaseResponse = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value }) =>
+            supabaseResponse.cookies.set(name, value),
+          );
+        },
+      },
+    },
+  );
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+  // 3. Get User FIRST so the variable is available for the check below
+  // We rename 'data.user' to just 'user' for convenience
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // IMPORTANT: Don't remove getClaims()
-  const { data } = await supabase.auth.getClaims();
+  // 4. Define which routes are authentication routes
+  const isAuthRoute =
+    request.nextUrl.pathname === "/login" ||
+    request.nextUrl.pathname === "/signup";
 
-  const user = data?.claims;
+  // 5. Redirect logic
+  if (isAuthRoute && user) {
+    // The fallback 'request.url' prevents a crash if the .env file is missing or empty.
+    const redirectBase = process.env.NEXT_PUBLIC_BASE_URL || request.url;
+
+    return NextResponse.redirect(new URL("/", redirectBase));
+  }
 
   return supabaseResponse;
 }
