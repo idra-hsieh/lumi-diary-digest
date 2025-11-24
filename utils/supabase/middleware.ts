@@ -31,8 +31,7 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // 3. Get User FIRST so the variable is available for the check below
-  // We rename 'data.user' to just 'user' for convenience
+  // 3. Get User
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -44,47 +43,76 @@ export async function updateSession(request: NextRequest) {
 
   // 5. Redirect logic
 
-  // redirect logged in users to home page from /signup and /login
-
+  // Redirect logged in users to home page from /signup and /login
   if (isAuthRoute && user) {
-    // The fallback 'request.url' prevents a crash if the .env file is missing or empty.
-    const redirectBase = process.env.NEXT_PUBLIC_URL || request.url;
-
+    const redirectBase = process.env.NEXT_PUBLIC_URL || request.nextUrl.origin;
     return NextResponse.redirect(new URL("/", redirectBase));
   }
 
-  // if no user.id, automatically go to the newest diary; if no diary, create new
-
+  // Check params
   const { searchParams, pathname } = new URL(request.url);
 
-  if (!searchParams.get("diaryId") && pathname === "/") {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-  }
+  // FIX: Only run this logic if we are on the homepage ("/") AND not already selecting a diary.
+  // This prevents the middleware from running on the /api/ call itself.
+  if (user && pathname === "/" && !searchParams.get("diaryId")) {
+    // Use request.nextUrl.origin as a fallback if NEXT_PUBLIC_URL is not set
+    const baseUrl = process.env.NEXT_PUBLIC_URL || request.nextUrl.origin;
 
-  if (user) {
-    const { newestDiaryId } = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/fetch-newest-diary?userId=${user.id}`,
-    ).then((res) => res.json());
+    try {
+      const fetchResponse = await fetch(
+        `${baseUrl}/api/fetch-newest-diary?userId=${user.id}`,
+      );
 
-    if (newestDiaryId) {
-      const url = request.nextUrl.clone();
-      url.searchParams.set("diaryId", newestDiaryId);
-      return NextResponse.redirect(url);
-    } else {
-      const { diaryId } = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/create-new-diary?userId=${user.id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+      if (!fetchResponse.ok) {
+        throw new Error(
+          `Failed to fetch newest diary: ${fetchResponse.status}`,
+        );
+      }
+
+      const text = await fetchResponse.text();
+      if (!text) {
+        throw new Error("Empty response from fetch-newest-diary");
+      }
+
+      const { newestDiaryId } = JSON.parse(text);
+
+      if (newestDiaryId) {
+        const url = request.nextUrl.clone();
+        url.searchParams.set("diaryId", newestDiaryId);
+        return NextResponse.redirect(url);
+      } else {
+        const createResponse = await fetch(
+          `${baseUrl}/api/create-new-diary?userId=${user.id}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        },
-      ).then((res) => res.json());
-      const url = request.nextUrl.clone();
-      url.searchParams.set("diaryId", diaryId);
-      return NextResponse.redirect(url);
+        );
+
+        if (!createResponse.ok) {
+          throw new Error(
+            `Failed to create new diary: ${createResponse.status}`,
+          );
+        }
+
+        const createText = await createResponse.text();
+        if (!createText) {
+          throw new Error("Empty response from create-new-diary");
+        }
+
+        const { diaryId } = JSON.parse(createText);
+
+        const url = request.nextUrl.clone();
+        url.searchParams.set("diaryId", diaryId);
+        return NextResponse.redirect(url);
+      }
+    } catch (error) {
+      // Log error but don't block the request - let the user through
+      console.error("Error in middleware:", error);
+      // Return the response without redirecting
+      return supabaseResponse;
     }
   }
 
