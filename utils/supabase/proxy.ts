@@ -7,9 +7,9 @@ export async function updateSession(request: NextRequest) {
   const supabaseAnonKey =
     process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // If env vars are missing, let the request continue instead of crashing middleware
+  // If env vars are missing, let the request continue instead of crashing proxy
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error("Supabase env vars are not configured for middleware");
+    console.error("Supabase env vars are not configured for proxy");
     return NextResponse.next({ request });
   }
 
@@ -46,7 +46,7 @@ export async function updateSession(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (userError) {
-      console.error("Supabase getUser error in middleware:", userError.message);
+      console.error("Supabase getUser error in proxy:", userError.message);
       return supabaseResponse;
     }
 
@@ -68,7 +68,7 @@ export async function updateSession(request: NextRequest) {
     const { searchParams, pathname } = new URL(request.url);
 
     // FIX: Only run this logic if we are on the homepage ("/") AND not already selecting a diary.
-    // This prevents the middleware from running on the /api/ call itself.
+    // This prevents the proxy from running on the /api/ call itself.
     if (user && pathname === "/" && !searchParams.get("diaryId")) {
       // Use request.nextUrl.origin as a fallback if NEXT_PUBLIC_URL is not set
       const baseUrl = process.env.NEXT_PUBLIC_URL || request.nextUrl.origin;
@@ -125,13 +125,13 @@ export async function updateSession(request: NextRequest) {
         }
       } catch (error) {
         // Log error but don't block the request - let the user through
-        console.error("Error in middleware:", error);
+        console.error("Error in proxy:", error);
         // Return the response without redirecting
         return supabaseResponse;
       }
     }
   } catch (error) {
-    console.error("Error initializing Supabase in middleware:", error);
+    console.error("Error initializing Supabase in proxy:", error);
     return supabaseResponse;
   }
 
