@@ -47,71 +47,71 @@
   --radius: 0.625rem;
   --background: #F3EEE2;
   --foreground: #1C424C;
-  --card: oklch(0.98 0.005 95);
-  --card-foreground: oklch(0.22 0.04 260);
-  --popover: oklch(0.99 0.005 95);
-  --popover-foreground: oklch(0.22 0.04 260);
+  --card: #FFFFFF;
+  --card-foreground: #1C424C;
+  --popover: #FFFFFF;
+  --popover-foreground: #1C424C;
   --primary: #1C424C;
   --primary-foreground: #F3EEE2;
-  --secondary:#1c424cc6;
+  --secondary: #2F5B68;
   --secondary-foreground: #F3EEE2;
-  --muted: #CFD1C9;
-  --muted-foreground: oklch(0.52 0.04 260);
-  --accent: #97A5A2;
-  --accent-foreground: #697F81;
-  --destructive: oklch(0.58 0.17 25);
-  --destructive-foreground: oklch(0.98 0.005 95);
-  --border: oklch(0.92 0.01 255);
-  --input: oklch(0.92 0.01 255);
-  --ring: oklch(0.70 0.04 256);
-  --chart-1: oklch(0.66 0.22 40);
-  --chart-2: oklch(0.60 0.15 185);
-  --chart-3: oklch(0.46 0.09 250);
-  --chart-4: oklch(0.78 0.20 85);
-  --chart-5: oklch(0.72 0.17 70);
+  --muted: #E4DFD2;
+  --muted-foreground: #4A6269;
+  --accent: #6F8C94;
+  --accent-foreground: #F3EEE2;
+  --destructive: #C25D52;
+  --destructive-foreground: #FFF8EF;
+  --border: #D8D1C2;
+  --input: #D8D1C2;
+  --ring: #2F5B68;
+  --chart-1: #1C424C;
+  --chart-2: #2F5B68;
+  --chart-3: #6F8C94;
+  --chart-4: #C8A27A;
+  --chart-5: #E7CFAF;
   --sidebar: #F3EEE2;
-  --sidebar-foreground: oklch(0.22 0.04 260);
-  --sidebar-primary: oklch(0.28 0.04 260);
-  --sidebar-primary-foreground: oklch(0.98 0.005 95);
-  --sidebar-accent: #97A5A2;
-  --sidebar-accent-foreground: #697F81;
-  --sidebar-border: oklch(0.92 0.01 255);
-  --sidebar-ring: oklch(0.70 0.04 256);
+  --sidebar-foreground: #1C424C;
+  --sidebar-primary: #1C424C;
+  --sidebar-primary-foreground: #F3EEE2;
+  --sidebar-accent: #6F8C94;
+  --sidebar-accent-foreground: #F3EEE2;
+  --sidebar-border: #D8D1C2;
+  --sidebar-ring: #2F5B68;
 }
 
 .dark {
-  --background: #14313A;
+  --background: #0F2229;
   --foreground: #F3EEE2;
-  --card: #1C424C;
+  --card: #102A32;
   --card-foreground: #F3EEE2;
-  --popover: #1C424C;
+  --popover: #102A32;
   --popover-foreground: #F3EEE2;
-  --primary: #C3C7C0;
-  --primary-foreground: #14313A;
+  --primary: #F3EEE2;
+  --primary-foreground: #0F2229;
   --secondary: #1C424C;
   --secondary-foreground: #F3EEE2;
-  --muted: #243941;
-  --muted-foreground: #C3C7C0;
-  --accent: #97A5A2;
-  --accent-foreground: #14313A;
-  --destructive: #C46A5A;
-  --destructive-foreground: #14313A;
-  --border: rgba(243, 238, 226, 0.14);
-  --input: rgba(243, 238, 226, 0.08);
-  --ring: rgba(243, 238, 226, 0.28);
-  --chart-1: #C3C7C0;
-  --chart-2: #97A5A2; 
-  --chart-3: #C3A47A;
-  --chart-4: #C46A5A; 
-  --chart-5: #8C7A67;
-  --sidebar: #14313A;
+  --muted: #1A323A;
+  --muted-foreground: #C9D7D4;
+  --accent: #6F8C94;
+  --accent-foreground: #0F2229;
+  --destructive: #D17A6B;
+  --destructive-foreground: #0F2229;
+  --border: #243A42;
+  --input: #1A323A;
+  --ring: #7FA4AE;
+  --chart-1: #F3EEE2;
+  --chart-2: #A9C9C9;
+  --chart-3: #6F8C94;
+  --chart-4: #E7CFAF;
+  --chart-5: #D17A6B;
+  --sidebar: #0F2229;
   --sidebar-foreground: #F3EEE2;
-  --sidebar-primary: #C3C7C0;
-  --sidebar-primary-foreground: #14313A;
-  --sidebar-accent: #97A5A2;
-  --sidebar-accent-foreground: #14313A;
-  --sidebar-border: rgba(243, 238, 226, 0.14);
-  --sidebar-ring: rgba(243, 238, 226, 0.28);
+  --sidebar-primary: #F3EEE2;
+  --sidebar-primary-foreground: #0F2229;
+  --sidebar-accent: #6F8C94;
+  --sidebar-accent-foreground: #0F2229;
+  --sidebar-border: #243A42;
+  --sidebar-ring: #7FA4AE;
 }
 
 @layer base {
@@ -128,31 +128,31 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #F3EEE2;
+  background: #E4DFD2;
   border-radius: 0 8px 8px 0;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #F3EEE2;
+  background: #C8A27A;
   border-radius: 8px;
   border: 1px solid #F3EEE2;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #F3EEE2;
+  background: #B98D64;
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-track {
-  background: #14313A;
+  background: #1A323A;
   border-radius: 0 8px 8px 0;
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(217.2 32.6% 17.5%);
+  background: #6F8C94;
   border-radius: 8px;
-  border: 1px solid #14313A;
+  border: 1px solid #243A42;
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #14313A;
+  background: #5B7680;
 }
