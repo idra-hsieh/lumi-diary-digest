@@ -33,8 +33,13 @@ async function Homepage({ searchParams }: Props) {
       <DiaryTitleInput
         diaryId={diaryId}
         startingDiaryTitle={derivedDiaryTitle}
+        isLoggedIn={!!user}
       />
-      <DiaryTextInput diaryId={diaryId} startingDiaryText={diary?.text || ""} />
+      <DiaryTextInput
+        diaryId={diaryId}
+        startingDiaryText={diary?.text || ""}
+        isLoggedIn={!!user}
+      />
     </div>
   );
 }

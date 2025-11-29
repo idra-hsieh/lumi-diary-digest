@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "./ui/input";
 import { ChangeEvent, useEffect, useRef } from "react";
 import { debounceTimeout } from "@/lib/constants";
@@ -10,9 +10,11 @@ import { updateDiaryAction } from "@/actions/diaries";
 type Props = {
   diaryId: string;
   startingDiaryTitle: string;
+  isLoggedIn: boolean;
 };
 
-function DiaryTitleInput({ diaryId, startingDiaryTitle }: Props) {
+function DiaryTitleInput({ diaryId, startingDiaryTitle, isLoggedIn }: Props) {
+  const router = useRouter();
   const diaryIdParam = useSearchParams().get("diaryId") || "";
   const { diaryTitle, setDiaryTitle } = useDiary();
 
@@ -47,6 +49,11 @@ function DiaryTitleInput({ diaryId, startingDiaryTitle }: Props) {
 
   /** Handle user typing */
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!isLoggedIn) {
+      router.push("/login");
+      return;
+    }
+
     if (!diaryId) return;
 
     const title = e.target.value;
@@ -67,7 +74,11 @@ function DiaryTitleInput({ diaryId, startingDiaryTitle }: Props) {
       <Input
         value={diaryTitle}
         onChange={handleTitleChange}
+        onFocus={() => {
+          if (!isLoggedIn) router.push("/login");
+        }}
         placeholder="  Add a title..."
+        readOnly={!isLoggedIn || !diaryId}
         className="custom-scrollbar placeholder:text-muted-foreground/80 text-foreground mb-2 w-full border p-2 text-lg font-medium tracking-wide focus-visible:ring-0 focus-visible:ring-offset-0"
       />
     </div>

@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createDiaryAction } from "@/actions/diaries";
 import { DIARY_CREATED_EVENT } from "@/lib/constants";
+import useDiary from "@/hooks/useDiary";
 
 type DiaryCreatedEventPayload = {
   id: string;
@@ -25,6 +26,7 @@ type Props = {
 
 function NewDiaryButton({ user }: Props) {
   const router = useRouter();
+  const { setDiaryText, setDiaryTitle } = useDiary();
 
   const [loading, setLoading] = useState(false);
 
@@ -56,7 +58,10 @@ function NewDiaryButton({ user }: Props) {
           );
         }
 
-        router.push(`/?diaryId=${uuid}`);
+        setDiaryText("");
+        setDiaryTitle("");
+
+        router.push(`/?diaryId=${diary.id}`);
         router.refresh();
         toast.success("You have created a new diary.");
       } finally {
