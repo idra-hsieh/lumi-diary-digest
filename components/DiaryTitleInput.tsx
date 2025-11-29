@@ -67,7 +67,7 @@ function DiaryTitleInput({ diaryId, startingDiaryTitle }: Props) {
       <Input
         value={diaryTitle}
         onChange={handleTitleChange}
-        placeholder="Add a title..."
+        placeholder="  Add a title..."
         className="custom-scrollbar placeholder:text-muted-foreground/80 text-foreground mb-2 w-full border p-2 text-lg font-medium tracking-wide focus-visible:ring-0 focus-visible:ring-offset-0"
       />
     </div>

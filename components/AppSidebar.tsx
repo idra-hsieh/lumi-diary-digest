@@ -29,7 +29,7 @@ async function AppSidebar() {
     <Sidebar>
       <SidebarContent className="custom-scrollbar">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-md text-foreground mt-2 mb-2">
+          <SidebarGroupLabel className="text-foreground mt-3 mb-3 ml-2 text-[15px]">
             {user ? (
               "Your Diaries"
             ) : (
