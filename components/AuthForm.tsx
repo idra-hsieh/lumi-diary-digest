@@ -90,7 +90,7 @@ function AuthForm({ type }: Props) {
           {"  "}
           <Link
             href={isLoginForm ? "/signup" : "/login"}
-            className={`text-green-700 underline ${
+            className={`text-[#A9C9C9] underline hover:font-semibold ${
               isPending ? "pointer-events-none opacity-50" : ""
             }`}
           >
