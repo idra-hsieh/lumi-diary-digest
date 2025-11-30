@@ -3,6 +3,7 @@
 import { prisma } from "@/db/prisma";
 import { handleError } from "@/lib/utils";
 import { getUser } from "@/utils/supabase/server";
+import { GoogleGenAI } from "@google/genai";
 
 export const createDiaryAction = async (diaryId: string) => {
   try {
@@ -63,5 +64,122 @@ export const deleteDiaryAction = async (diaryId: string) => {
     return { errorMessage: null };
   } catch (error) {
     return handleError(error);
+  }
+};
+
+type AskAIResponse = {
+  answer: string;
+  errorMessage: string | null;
+};
+
+// Helper to sanitize/handle errors
+const handleAIError = (error: unknown): AskAIResponse => {
+  console.error("AI Error:", error);
+  return {
+    answer: "",
+    errorMessage: "Something went wrong while contacting the AI.",
+  };
+};
+
+export const askAIAboutDiariesAction = async (
+  questions: string[], // Full history of user questions
+  responses: string[], // Full history of AI responses (should be length of questions - 1)
+): Promise<AskAIResponse> => {
+  try {
+    // 1. Authenticate
+    const user = await getUser();
+    if (!user) throw new Error("You must log in to ask AI questions.");
+
+    // 2. Fetch User Data
+    const diaries = await prisma.diary.findMany({
+      where: { authorId: user.id },
+      orderBy: { createdAt: "desc" },
+      select: { text: true, createdAt: true, updatedAt: true },
+    });
+
+    if (diaries.length === 0) {
+      return {
+        answer: "You don't have any diary entries yet.",
+        errorMessage: null,
+      };
+    }
+
+    // 3. Format Context (The Diaries)
+    const formattedDiaries = diaries
+      .map((diary) =>
+        `
+        Date: ${diary.createdAt.toDateString()}
+        Content: ${diary.text}
+        `.trim(),
+      )
+      .join("\n---\n");
+
+    // 4. Construct System Instruction
+    const systemInstruction = `
+    You are an empathetic and insightful AI assistant for a personal diary application called "Ask AI About Your Diaries."
+    
+    YOUR GOAL:
+    Provide tailored summaries, psychological insights, and reflection prompts based strictly on the user's provided diary entries.
+
+    GUIDELINES:
+    1. Source Material: Assume all user questions refer to the diary entries provided below. If the answer isn't in the diaries, gently state that you don't have that information.
+    2. Tone: Be warm, supportive, and objective. Avoid being overly flowery or robotic. Speak succinctly but with depth.
+    3. Formatting: Your responses MUST be returned as raw, clean, valid HTML fragments suitable for rendering in a React component. 
+      - Use semantic tags: <p>, <ul>, <ol>, <li>, <strong>, <em>, <h3>, <h4>.
+      - Do NOT use Markdown (no #, **, etc.).
+      - Do NOT use <html>, <head>, or <body> tags.
+      - Do NOT wrap the entire result in a container div or single p tag unless it is a one-sentence answer.
+      - Do NOT use inline styles or classes.
+      - Technical Context: Rendered like this in JSX: <div dangerouslySetInnerHTML={{ __html: YOUR_RESPONSE }} />
+
+    SPECIFIC TASK BEHAVIORS:
+    - If asked for a SUMMARY: Provide a concise bulleted list or a short paragraph highlighting key events and emotions.
+    - If asked for INSIGHTS: Connect patterns in behavior or mood across different entries.
+    - If asked for PROMPTS: Generate thoughtful, open-ended questions to help the user reflect on the specific topics discussed.
+    
+    Here are the user's diary entries:
+    ${formattedDiaries}
+    `;
+
+    // 5. Build Chat History for Gemini
+    // We zip the past questions and responses together
+    const history: { role: "user" | "model"; parts: { text: string }[] }[] = [];
+
+    // Iterate up to the second-to-last question (the last one is the NEW one we need to answer)
+    for (let i = 0; i < questions.length - 1; i++) {
+      if (questions[i]) {
+        history.push({ role: "user", parts: [{ text: questions[i] }] });
+      }
+      if (responses[i]) {
+        history.push({ role: "model", parts: [{ text: responses[i] }] });
+      }
+    }
+
+    // 6. Initialize GoogleGenAI Client
+    // Using the new @google/genai SDK pattern
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+    const chat = ai.chats.create({
+      model: "gemini-2.5-flash",
+      config: {
+        systemInstruction: systemInstruction,
+      },
+      history: history,
+    });
+
+    // 7. Send the LATEST question
+    const currentQuestion = questions[questions.length - 1];
+    if (!currentQuestion) throw new Error("No question provided.");
+
+    // The new SDK uses chat.send() and result.text getter
+    const result = await chat.send({
+      parts: [{ text: currentQuestion }],
+    });
+
+    const answer = result.text || "I couldn't generate a response.";
+
+    return { answer, errorMessage: null };
+  } catch (error) {
+    return handleAIError(error);
   }
 };
