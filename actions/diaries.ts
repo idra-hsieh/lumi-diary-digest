@@ -94,8 +94,11 @@ export const askAIAboutDiariesAction = async (
     const diaries = await prisma.diary.findMany({
       where: { authorId: user.id },
       orderBy: { createdAt: "desc" },
+      take: 30,
       select: { text: true, createdAt: true, updatedAt: true },
     });
+
+    const diaries = diariesRaw.reverse();
 
     if (diaries.length === 0) {
       return {
