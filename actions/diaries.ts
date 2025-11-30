@@ -91,7 +91,7 @@ export const askAIAboutDiariesAction = async (
     if (!user) throw new Error("You must log in to ask AI questions.");
 
     // 2. Fetch User Data
-    const diaries = await prisma.diary.findMany({
+    const diariesRaw = await prisma.diary.findMany({
       where: { authorId: user.id },
       orderBy: { createdAt: "desc" },
       take: 30,
