@@ -171,9 +171,8 @@ export const askAIAboutDiariesAction = async (
     const currentQuestion = questions[questions.length - 1];
     if (!currentQuestion) throw new Error("No question provided.");
 
-    // The new SDK uses chat.send() and result.text getter
-    const result = await chat.send({
-      parts: [{ text: currentQuestion }],
+    const result = await chat.sendMessage({
+      message: currentQuestion,
     });
 
     const answer = result.text || "I couldn't generate a response.";
