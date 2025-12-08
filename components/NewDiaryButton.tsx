@@ -58,11 +58,24 @@ function NewDiaryButton({ user }: Props) {
           );
         }
 
-        setDiaryText("");
-        setDiaryTitle("");
+        // Navigate to the new diary and clear editor state once we're on it.
+        const newDiaryId = diary.id;
+        const clearIfViewingNewDiary = () => {
+          const currentId = new URL(window.location.href).searchParams.get(
+            "diaryId",
+          );
+          if (currentId === newDiaryId) {
+            setDiaryText("");
+            setDiaryTitle("");
+          }
+        };
 
-        router.push(`/?diaryId=${diary.id}`);
-        router.refresh();
+        router.push(`/?diaryId=${newDiaryId}`);
+        requestAnimationFrame(() => {
+          clearIfViewingNewDiary();
+          setTimeout(clearIfViewingNewDiary, 50);
+        });
+
         toast.success("You have created a new diary.");
       } finally {
         setLoading(false);

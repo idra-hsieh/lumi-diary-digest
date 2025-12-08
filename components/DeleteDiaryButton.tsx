@@ -25,7 +25,7 @@ type Props = {
 
 function DeleteDiaryButton({ diaryId, deleteDiaryLocally }: Props) {
   const router = useRouter();
-  const diaryIdParam = useSearchParams().get("diaryIs") || "";
+  const diaryIdParam = useSearchParams().get("diaryId") || "";
 
   const [isPending, startTransition] = useTransition();
 
@@ -33,17 +33,18 @@ function DeleteDiaryButton({ diaryId, deleteDiaryLocally }: Props) {
     startTransition(async () => {
       const { errorMessage } = await deleteDiaryAction(diaryId);
 
-      if (!errorMessage) {
-        toast.success("You have successfully deleted the diary.");
+      if (errorMessage) {
+        toast.error(errorMessage);
+        return;
       }
 
       deleteDiaryLocally(diaryId);
 
       if (diaryId === diaryIdParam) {
         router.replace("/");
-      } else {
-        toast.error(errorMessage);
       }
+
+      toast.success("You have successfully deleted the diary.");
     });
   };
 

@@ -8,11 +8,13 @@ import {
 } from "./ui/sidebar";
 import { SearchIcon } from "lucide-react";
 import { Input } from "./ui/input";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Fuse from "fuse.js";
 import SelectDiaryButton from "./SelectDiaryButton";
 import DeleteDiaryButton from "./DeleteDiaryButton";
 import { DIARY_CREATED_EVENT } from "@/lib/constants";
+import { useSearchParams } from "next/navigation";
+import useDiary from "@/hooks/useDiary";
 
 type Props = {
   diaries: Diary[];
@@ -28,6 +30,10 @@ type DiaryCreatedEventPayload = {
 };
 
 function SidebarGroupContent({ diaries }: Props) {
+  const searchParams = useSearchParams();
+  const selectedDiaryId = searchParams.get("diaryId");
+  const { diaryTitle, diaryText } = useDiary();
+  const lastSelectedDiaryIdRef = useRef<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const [localDiaries, setLocalDiaries] = useState(diaries);
 
@@ -63,6 +69,39 @@ function SidebarGroupContent({ diaries }: Props) {
       window.removeEventListener(DIARY_CREATED_EVENT, handleDiaryCreated);
     };
   }, []);
+
+  useEffect(() => {
+    if (!selectedDiaryId) return;
+
+    // Avoid marking as updated when the user simply switches diaries.
+    if (lastSelectedDiaryIdRef.current !== selectedDiaryId) {
+      lastSelectedDiaryIdRef.current = selectedDiaryId;
+      return;
+    }
+
+    setLocalDiaries((prevDiaries) => {
+      let hasChanged = false;
+
+      const updatedDiaries = prevDiaries.map((diary) => {
+        if (diary.id !== selectedDiaryId) return diary;
+
+        const titleChanged = diary.title !== diaryTitle;
+        const textChanged = diary.text !== diaryText;
+
+        if (!titleChanged && !textChanged) return diary;
+
+        hasChanged = true;
+        return {
+          ...diary,
+          title: diaryTitle,
+          text: diaryText,
+          updatedAt: new Date(),
+        };
+      });
+
+      return hasChanged ? updatedDiaries : prevDiaries;
+    });
+  }, [selectedDiaryId, diaryTitle, diaryText]);
 
   const fuse = useMemo(() => {
     return new Fuse(localDiaries, {
