@@ -16,7 +16,7 @@ type Props = {
 function DiaryTitleInput({ diaryId, startingDiaryTitle, isLoggedIn }: Props) {
   const router = useRouter();
   const diaryIdParam = useSearchParams().get("diaryId") || "";
-  const { diaryTitle, setDiaryTitle } = useDiary();
+  const { diaryTitle, setDiaryTitle, setSelectedDiaryId } = useDiary();
 
   // useRef prevents the global timeout pollution
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -28,6 +28,11 @@ function DiaryTitleInput({ diaryId, startingDiaryTitle, isLoggedIn }: Props) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
+
+  // Keep the globally selected diary id in sync with the current page.
+  useEffect(() => {
+    setSelectedDiaryId(diaryId || "");
+  }, [diaryId, setSelectedDiaryId]);
 
   /**
    * Sync when a new diary is selected.

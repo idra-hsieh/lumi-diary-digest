@@ -3,7 +3,6 @@
 import useDiary from "@/hooks/useDiary";
 import { Diary } from "@prisma/client";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { SidebarMenuButton } from "./ui/sidebar";
 import { BLANK_DIARY_TEXT } from "@/lib/constants";
 import { buildDiaryFallbackTitle, cn } from "@/lib/utils";
@@ -13,11 +12,12 @@ type Props = {
 };
 
 function SelectDiaryButton({ diary }: Props) {
-  const diaryId = useSearchParams().get("diaryId") || "";
-
-  const { diaryText: selectedDiaryText, diaryTitle: selectedDiaryTitle } =
-    useDiary();
-  const isSelected = diaryId === diary.id;
+  const {
+    diaryText: selectedDiaryText,
+    diaryTitle: selectedDiaryTitle,
+    selectedDiaryId,
+  } = useDiary();
+  const isSelected = selectedDiaryId === diary.id;
 
   const fallbackTitle = buildDiaryFallbackTitle(diary.createdAt, "-");
 

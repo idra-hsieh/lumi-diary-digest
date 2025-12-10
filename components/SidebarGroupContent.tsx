@@ -13,7 +13,6 @@ import Fuse from "fuse.js";
 import SelectDiaryButton from "./SelectDiaryButton";
 import DeleteDiaryButton from "./DeleteDiaryButton";
 import { DIARY_CREATED_EVENT } from "@/lib/constants";
-import { useSearchParams } from "next/navigation";
 import useDiary from "@/hooks/useDiary";
 
 type Props = {
@@ -30,9 +29,7 @@ type DiaryCreatedEventPayload = {
 };
 
 function SidebarGroupContent({ diaries }: Props) {
-  const searchParams = useSearchParams();
-  const selectedDiaryId = searchParams.get("diaryId");
-  const { diaryTitle, diaryText } = useDiary();
+  const { diaryTitle, diaryText, selectedDiaryId } = useDiary();
   const lastSelectedDiaryIdRef = useRef<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const [localDiaries, setLocalDiaries] = useState(diaries);
