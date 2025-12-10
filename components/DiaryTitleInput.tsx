@@ -82,9 +82,9 @@ function DiaryTitleInput({ diaryId, startingDiaryTitle, isLoggedIn }: Props) {
         onFocus={() => {
           if (!isLoggedIn) router.push("/login");
         }}
-        placeholder="  Add a title..."
+        placeholder="Add a title..."
         readOnly={!isLoggedIn || !diaryId}
-        className="custom-scrollbar placeholder:text-muted-foreground/80 text-foreground mb-2 w-full border p-2 text-lg font-medium tracking-wide focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="custom-scrollbar placeholder:text-muted-foreground/80 text-foreground mb-2 w-full border p-2 pl-4 text-lg font-medium tracking-wide focus-visible:ring-0 focus-visible:ring-offset-0"
       />
     </div>
   );
