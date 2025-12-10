@@ -28,6 +28,12 @@ type DiaryCreatedEventPayload = {
   updatedAt: string;
 };
 
+const sortDiariesByCreatedAt = (diaries: Diary[]) =>
+  [...diaries].sort(
+    (a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+
 function SidebarGroupContent({ diaries }: Props) {
   const { diaryTitle, diaryText, selectedDiaryId } = useDiary();
   const lastSelectedDiaryIdRef = useRef<string | null>(null);
@@ -107,9 +113,13 @@ function SidebarGroupContent({ diaries }: Props) {
     });
   }, [localDiaries]);
 
-  const filteredDiaries = searchText
-    ? fuse.search(searchText).map((result) => result.item)
-    : localDiaries;
+  const filteredDiaries = useMemo(() => {
+    const diariesToFilter = searchText
+      ? fuse.search(searchText).map((result) => result.item)
+      : localDiaries;
+
+    return sortDiariesByCreatedAt(diariesToFilter);
+  }, [searchText, fuse, localDiaries]);
 
   const deleteDiaryLocally = (diaryId: string) => {
     setLocalDiaries((prevDiaries) =>

@@ -30,19 +30,32 @@ function SelectDiaryButton({ diary }: Props) {
   const normalizedText = sourceText?.trim() ?? "";
   const displayText = normalizedText || BLANK_DIARY_TEXT;
   const isFallbackText = normalizedText.length === 0;
-  const formattedUpdatedAt = new Date(diary.updatedAt).toLocaleString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const formattedCreatedAt = new Date(diary.createdAt).toLocaleString(
+    undefined,
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  );
+  const formattedUpdatedAt = new Date(diary.updatedAt).toLocaleString(
+    undefined,
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  );
 
   return (
     <SidebarMenuButton
       asChild
       className={cn(
-        "items-start gap-0 pr-12",
+        "items-start gap-1 pr-12",
         isSelected && "bg-sidebar-accent/30",
       )}
     >
@@ -50,20 +63,23 @@ function SelectDiaryButton({ diary }: Props) {
         <p
           className={cn(
             "text-foreground w-full truncate overflow-hidden text-sm font-semibold whitespace-nowrap",
-            isFallbackTitle && "opacity-70",
+            isFallbackTitle && "opacity-60",
           )}
         >
           {displayTitle}
         </p>
         <p
           className={cn(
-            "text-foreground w-full truncate overflow-hidden text-xs whitespace-nowrap",
-            isFallbackText && "opacity-70",
+            "text-foreground/80 line-clamp-2 w-full overflow-hidden text-[12px]",
+            isFallbackText && "opacity-60",
           )}
         >
           {displayText}
         </p>
-        <p className="text-muted-foreground text-xs">
+        <p className="text-muted-foreground/60 text-[10px]">
+          Created: {formattedCreatedAt}
+        </p>
+        <p className="text-muted-foreground/60 text-[10px]">
           Last updated: {formattedUpdatedAt}
         </p>
       </Link>
