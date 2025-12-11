@@ -95,7 +95,7 @@ export const askAIAboutDiariesAction = async (
       where: { authorId: user.id },
       orderBy: { createdAt: "desc" },
       take: 30,
-      select: { text: true, createdAt: true, updatedAt: true },
+      select: { title: true, text: true, createdAt: true, updatedAt: true },
     });
 
     const diaries = diariesRaw.reverse();
@@ -111,7 +111,9 @@ export const askAIAboutDiariesAction = async (
     const formattedDiaries = diaries
       .map((diary) =>
         `
-        Date: ${diary.createdAt.toDateString()}
+        Created: ${diary.createdAt.toDateString()}
+        Updated: ${diary.updatedAt.toDateString()}
+        Title: ${diary.title || "(Untitled)"}
         Content: ${diary.text}
         `.trim(),
       )
